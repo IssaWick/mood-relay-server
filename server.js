@@ -14,6 +14,9 @@ app.use(express.json());
 let latestMood = "ROUND";
 let lastUpdated = Date.now();
 
+let latestAngle = 90;
+let angleUpdated = Date.now();
+
 // ================================
 // ROUTES
 // ================================
@@ -53,6 +56,26 @@ app.get("/get-mood", (req, res) => {
   res.json({ mood: latestMood });
 });
 
+// Python sends angle
+app.post("/update-angle", (req, res) => {
+  const { angle } = req.body;
+
+  if (typeof angle !== "number") {
+    return res.status(400).json({ error: "Angle required" });
+  }
+
+  latestAngle = Math.max(0, Math.min(180, angle));
+  angleUpdated = Date.now();
+
+  console.log(`[UPDATE] Angle: ${latestAngle}`);
+  res.json({ success: true });
+});
+
+// ESP32 fetches angle
+app.get("/get-angle", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json({ angle: latestAngle });
+});
 
 // ================================
 // START SERVER
