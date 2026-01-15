@@ -15,7 +15,8 @@ let latestMood = "ROUND";
 let lastUpdated = Date.now();
 
 let latestAngle = 90;
-let angleUpdated = Date.now();
+let angleUpdated = 0;
+let angleValid = false;
 
 // ================================
 // ROUTES
@@ -66,6 +67,7 @@ app.post("/update-angle", (req, res) => {
 
   latestAngle = Math.max(0, Math.min(180, angle));
   angleUpdated = Date.now();
+  angleValid = true;
 
   console.log(`[UPDATE] Angle: ${latestAngle}`);
   res.json({ success: true });
@@ -74,7 +76,10 @@ app.post("/update-angle", (req, res) => {
 // ESP32 fetches angle
 app.get("/get-angle", (req, res) => {
   res.set("Cache-Control", "no-store");
-  res.json({ angle: latestAngle });
+  res.json({
+    angle: latestAngle,
+    valid: angleValid   // 🔴 SEND VALID FLAG
+  });
 });
 
 // ================================
